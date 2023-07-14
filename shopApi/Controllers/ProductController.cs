@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using shopApi.Models;
 using System.Data;
+using System.Xml.Linq;
 
 namespace shopApi.Controllers
 {
@@ -17,12 +18,19 @@ namespace shopApi.Controllers
         }
 
         [HttpGet]
-        public JsonResult Get()
+        public JsonResult Get(string? id)
         {
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
             DataTable table = new DataTable();
             MySqlDataReader myReader;
+
             string query = @"SELECT * FROM `product`";
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                query += $" WHERE `id` = '{id}'";
+            }
+
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();
@@ -35,7 +43,6 @@ namespace shopApi.Controllers
             mycon.Close();
             return new JsonResult(table);
         }
-
         [HttpDelete]
         public JsonResult Delete(int id)
         {
@@ -55,14 +62,13 @@ namespace shopApi.Controllers
             mycon.Close();
             return new JsonResult(table);
         }
-
         [HttpPost]
         public JsonResult Post(Products products)
         {
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
 
-            string query = @"INSERT INTO `product`(`brand`, `model`, `description`, `price`, `amount`, `image`) " +
-                            @"VALUES (@brand,@model,@description,@price,@amount,@image)";
+            string query = @"INSERT INTO `product`(`brand`, `model`, `description`, `price`, `amount`, `category`,`image`) " +
+                            @"VALUES (@brand,@model,@description,@price,@amount,@category,@image)";
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();
@@ -73,21 +79,20 @@ namespace shopApi.Controllers
             mySqlCommand.Parameters.AddWithValue("@description", products.Description);
             mySqlCommand.Parameters.AddWithValue("@price", products.Price);
             mySqlCommand.Parameters.AddWithValue("@amount", products.Amount);
+            mySqlCommand.Parameters.AddWithValue("@category", products.Category);
             mySqlCommand.Parameters.AddWithValue("@image", products.Image);
             mySqlCommand.ExecuteNonQuery();
 
             mycon.Close();
             return new JsonResult("Insert Successfully");
         }
-
-
         [HttpPut]
         public JsonResult Put(Products products)
         {
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
 
             string query = @"UPDATE `product` SET `brand`=@brand,`model`=@model,`description`=@description," +
-                @"`price`=@price,`amount`=@amount,`image`=@image WHERE `id`=@id";
+                @"`price`=@price,`amount`=@amount,`category`=@category,`image`=@image WHERE `id`=@id";
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();
@@ -99,6 +104,7 @@ namespace shopApi.Controllers
             mySqlCommand.Parameters.AddWithValue("@description", products.Description);
             mySqlCommand.Parameters.AddWithValue("@price", products.Price);
             mySqlCommand.Parameters.AddWithValue("@amount", products.Amount);
+            mySqlCommand.Parameters.AddWithValue("@category", products.Category);
             mySqlCommand.Parameters.AddWithValue("@image", products.Image);
             mySqlCommand.ExecuteNonQuery();
 

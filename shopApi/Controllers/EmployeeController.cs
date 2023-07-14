@@ -96,7 +96,7 @@ namespace shopApi.Controllers
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
             DataTable table = new DataTable();
             MySqlDataReader myReader;
-            string query = $"SELECT * FROM `employee` WHERE `username` = '{username}' AND `password` = '{password}';";
+            string query = $"SELECT * FROM `employee` WHERE BINARY `username` = '{username}' AND `password` = '{password}';";
 
             try
             {
