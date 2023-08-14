@@ -72,14 +72,14 @@ namespace shopApi.Controllers
         public JsonResult Post(Customers customers)
         {
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
-            
-            string query =  $"INSERT INTO `customer`(`name`, `age`, `address`, `phone`, `username`, `password`) " +
-                            $"VALUES (@name,@age,@address,@phone,@username,@password)";
+
+            string query = $"INSERT INTO `customer`(`name`, `age`, `address`, `phone`, `username`, `password`, `image`) " +
+                            $"VALUES (@name,@age,@address,@phone,@username,@password,@image)";
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();
 
-            
+
             MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
             mySqlCommand.Parameters.AddWithValue("@name", customers.Name);
             mySqlCommand.Parameters.AddWithValue("@age", customers.Age);
@@ -87,6 +87,7 @@ namespace shopApi.Controllers
             mySqlCommand.Parameters.AddWithValue("@phone", customers.Phone);
             mySqlCommand.Parameters.AddWithValue("@username", customers.Username);
             mySqlCommand.Parameters.AddWithValue("@password", customers.Password);
+            mySqlCommand.Parameters.AddWithValue("@image", customers.Image);
             mySqlCommand.ExecuteReader();
 
             mycon.Close();
@@ -99,7 +100,7 @@ namespace shopApi.Controllers
             string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
 
             string query = @"UPDATE `customer` SET `name`=@name,`age`=@age," +
-                @"`address`=@address,`phone`=@phone,`username`=@username,`password`=@password WHERE `id`=@id";
+                @"`address`=@address,`phone`=@phone,`username`=@username,`password`=@password,`image`=@image WHERE `id`=@id";
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();
@@ -112,12 +113,32 @@ namespace shopApi.Controllers
             mySqlCommand.Parameters.AddWithValue("@phone", customers.Phone);
             mySqlCommand.Parameters.AddWithValue("@username", customers.Username);
             mySqlCommand.Parameters.AddWithValue("@password", customers.Password);
+            mySqlCommand.Parameters.AddWithValue("@image", customers.Image);
             mySqlCommand.ExecuteNonQuery();
 
             mycon.Close();
             return new JsonResult("Updated Successfully");
         }
 
+        [HttpGet("search")]
+        public JsonResult SearchAll(string search)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `customer` WHERE id LIKE '%{search}%' OR name LIKE '%{search}%' OR age LIKE '%{search}%' OR " +
+                           $"username LIKE '%{search}%' OR address LIKE '%{search}%' OR phone LIKE '%{search}%';";
 
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
+
+            myReader.Close();
+            mycon.Close();
+            return new JsonResult(table);
+        }
     }
 }

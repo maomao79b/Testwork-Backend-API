@@ -113,5 +113,26 @@ namespace shopApi.Controllers
 
             return new JsonResult("Updated Successfully");
         }
+
+        [HttpGet("search")]
+        public JsonResult SearchAll(string search)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `product` WHERE id LIKE '%{search}%' OR price LIKE '%{search}%' OR brand LIKE '%{search}%' OR " +
+                           $"model LIKE '%{search}%' OR description LIKE '%{search}%';";
+
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
+
+            myReader.Close();
+            mycon.Close();
+            return new JsonResult(table);
+        }
     }
 }

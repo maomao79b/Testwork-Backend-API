@@ -106,8 +106,31 @@ namespace shopApi.Controllers
             mySqlCommand.ExecuteNonQuery();
 
             mycon.Close();
-            return new JsonResult("Insert Successfully");
+            return new JsonResult("Update Successfully");
         }
+
+        [HttpGet("search")]
+        public JsonResult SearchAll(string search)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `acceptproduct` WHERE id LIKE '%{search}%' OR Ename LIKE '%{search}%' OR date LIKE '%{search}%' OR " +
+                           $"status LIKE '%{search}%' OR price LIKE '%{search}%' OR brand LIKE '%{search}%'" +
+                           $" OR model LIKE '%{search}%' OR description LIKE '%{search}%';";
+
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
+
+            myReader.Close();
+            mycon.Close();
+            return new JsonResult(table);
+        }
+
 
     }
 }

@@ -132,22 +132,26 @@ namespace shopApi.Controllers
             return new JsonResult("Updated Succesfully");
         }
 
-        //[HttpPut]
-        //public void Put(int id, int Eid, string Ename, string brand, string model, string productName, string description, DateOnly date, int price, string image)
-        //{
-        //    string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+        [HttpGet("search")]
+        public JsonResult SearchAll(string search)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `acceptproduct` WHERE status = 'รออนุมัติ' AND (id LIKE '%{search}%' OR Ename LIKE '%{search}%' OR date LIKE '%{search}%' OR " +
+                           $"price LIKE '%{search}%' OR brand LIKE '%{search}%'" +
+                           $" OR model LIKE '%{search}%' OR description LIKE '%{search}%');";
 
-        //    string query = $"UPDATE `acceptproduct` SET `Eid`='{Eid}',`Ename`='{Ename}',`productName`='{productName}',`description`='{description}'," +
-        //        $"`date`='{date}',`price`='{price}',`image`='{image}' WHERE `id`='{id}'";
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
 
-        //    MySqlConnection mycon = new MySqlConnection(sqlDataSource);
-        //    mycon.Open();
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
 
-        //    MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
-        //    mySqlCommand.ExecuteNonQuery();
-
-
-        //    mycon.Close();
-        //}
+            myReader.Close();
+            mycon.Close();
+            return new JsonResult(table);
+        }
     }
 }
