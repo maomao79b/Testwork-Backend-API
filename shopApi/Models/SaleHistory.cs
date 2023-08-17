@@ -6,5 +6,6 @@
         public string Cid { get; set; }
         public Decimal Total { get; set; }
         public string Product { get; set; }
+        public string Amount { get; set; }
     }
 }

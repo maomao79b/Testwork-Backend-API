@@ -121,7 +121,7 @@ namespace shopApi.Controllers
             DataTable table = new DataTable();
             MySqlDataReader myReader;
             string query = $"SELECT * FROM `product` WHERE id LIKE '%{search}%' OR price LIKE '%{search}%' OR brand LIKE '%{search}%' OR " +
-                           $"model LIKE '%{search}%' OR description LIKE '%{search}%';";
+                           $"model LIKE '%{search}%' OR description LIKE '%{search}%' OR category LIKE '%{search}%';";
 
             MySqlConnection mycon = new MySqlConnection(sqlDataSource);
             mycon.Open();

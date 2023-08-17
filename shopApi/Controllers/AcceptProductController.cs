@@ -38,6 +38,27 @@ namespace shopApi.Controllers
             return new JsonResult(table);
         }
 
+        [HttpGet("id")]
+        public JsonResult GetByid(string id)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `acceptproduct` WHERE id = {id}";
+
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
+
+            myReader.Close();
+            mycon.Close();
+
+            return new JsonResult(table);
+        }
+
         [HttpGet("confirmPage")]
         public JsonResult GetConfirm()
         {
@@ -112,6 +133,7 @@ namespace shopApi.Controllers
             mycon.Close();
             return new JsonResult("Inserted Successfully");
         }
+
         [HttpPut("status")]
         public JsonResult UpdateStatus(UpdateStatusAccept updateStatus)
         {
@@ -132,6 +154,37 @@ namespace shopApi.Controllers
             return new JsonResult("Updated Succesfully");
         }
 
+
+        [HttpPut]
+        public JsonResult Update(AcceptProducts update)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+
+            string query = @"UPDATE `acceptproduct` SET `Eid`=@Eid,`Ename`=@Ename,`brand`=@brand,`model`=@model,
+                            `description`=@description,`price`=@price,`amount`=@amount,`status`=@status,`product`=@product,
+                            `image`=@image WHERE `id`=@id";
+
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            mySqlCommand.Parameters.AddWithValue("@id", update.Id);
+            mySqlCommand.Parameters.AddWithValue("@Eid", update.Eid);
+            mySqlCommand.Parameters.AddWithValue("@Ename", update.Ename);
+            mySqlCommand.Parameters.AddWithValue("@brand", update.Brand);
+            mySqlCommand.Parameters.AddWithValue("@model", update.Model);
+            mySqlCommand.Parameters.AddWithValue("@description", update.Description);
+            mySqlCommand.Parameters.AddWithValue("@price", update.Price);
+            mySqlCommand.Parameters.AddWithValue("@amount", update.Amount);
+            mySqlCommand.Parameters.AddWithValue("@status", update.Status);
+            mySqlCommand.Parameters.AddWithValue("@product", update.Product);
+            mySqlCommand.Parameters.AddWithValue("@image", update.Image);
+            mySqlCommand.ExecuteNonQuery();
+
+
+            mycon.Close();
+            return new JsonResult("Updated Succesfully");
+        }
         [HttpGet("search")]
         public JsonResult SearchAll(string search)
         {

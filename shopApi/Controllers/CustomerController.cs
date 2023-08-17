@@ -140,5 +140,25 @@ namespace shopApi.Controllers
             mycon.Close();
             return new JsonResult(table);
         }
+
+        [HttpGet("checkcustomerdata")]
+        public JsonResult GetDataCustomer(string? id, string? phone)
+        {
+            string sqlDataSource = _configuration.GetConnectionString("ShopAppcon");
+            DataTable table = new DataTable();
+            MySqlDataReader myReader;
+            string query = $"SELECT * FROM `customer` WHERE id = {id} OR phone = {phone}";
+
+            MySqlConnection mycon = new MySqlConnection(sqlDataSource);
+            mycon.Open();
+
+            MySqlCommand mySqlCommand = new MySqlCommand(query, mycon);
+            myReader = mySqlCommand.ExecuteReader();
+            table.Load(myReader);
+
+            myReader.Close();
+            mycon.Close();
+            return new JsonResult(table);
+        }
     }
 }
